@@ -1,0 +1,93 @@
+name: Feature Request
+description: New feature or enhancement
+labels: ["feature"]
+body:
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: Which part of the application is this for?
+      options:
+        - Frontend
+        - Backend
+        - Both
+    validations:
+      required: true
+
+  - type: dropdown
+    id: entity
+    attributes:
+      label: Entity Type
+      description: Which entity type is affected (if applicable)?
+      options:
+        - Spells
+        - Monsters
+        - Items
+        - Races
+        - Classes
+        - Backgrounds
+        - Feats
+        - Character Wizard
+        - Global Search
+        - N/A
+    validations:
+      required: false
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What do you want to add and why?
+      placeholder: Brief description of the feature and its value
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: How should this be implemented?
+      placeholder: Describe the approach, affected files, or API changes
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      description: How do we know when this is done?
+      value: |
+        - [ ]
+        - [ ]
+        - [ ]
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this?
+      options:
+        - "High - Critical for upcoming release"
+        - "Medium - Important but not urgent"
+        - "Low - Nice to have"
+    validations:
+      required: false
+
+  - type: textarea
+    id: related
+    attributes:
+      label: Related Issues
+      description: Any related issues or dependencies?
+      placeholder: "#123, #456"
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Mockups, examples, or other relevant information
+    validations:
+      required: false

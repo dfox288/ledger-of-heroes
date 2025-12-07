@@ -1,0 +1,90 @@
+name: API Contract
+description: API design discussion or contract mismatch
+labels: ["api-contract", "both"]
+body:
+  - type: textarea
+    id: endpoint
+    attributes:
+      label: Endpoint
+      description: Which API endpoint is this about?
+      placeholder: "GET /api/v1/spells, POST /api/v1/characters, etc."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: Type
+      description: What kind of API issue is this?
+      options:
+        - "Contract Mismatch - Frontend expects X, backend returns Y"
+        - "New Endpoint - Need a new API endpoint"
+        - "Endpoint Change - Modify existing endpoint"
+        - "Documentation - API docs need updating"
+    validations:
+      required: true
+
+  - type: textarea
+    id: current
+    attributes:
+      label: Current Response
+      description: What does the API currently return? (if applicable)
+      placeholder: |
+        ```json
+        {
+          "data": { ... }
+        }
+        ```
+      render: json
+    validations:
+      required: false
+
+  - type: textarea
+    id: requested
+    attributes:
+      label: Requested Change
+      description: What do you need added or changed?
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Frontend Use Case
+      description: Why is this change needed? What frontend feature requires it?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed
+    attributes:
+      label: Proposed Response Structure
+      description: What should the API return?
+      placeholder: |
+        ```json
+        {
+          "data": { ... }
+        }
+        ```
+      render: json
+    validations:
+      required: false
+
+  - type: dropdown
+    id: breaking
+    attributes:
+      label: Breaking Change?
+      description: Would this break existing frontend code?
+      options:
+        - "No - Additive change only"
+        - "Yes - Requires frontend updates"
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Related issues, documentation links, or other context
+    validations:
+      required: false

@@ -129,14 +129,35 @@ gh issue close 42 --repo dfox288/dnd-rulebook-project \
 | `bug` | Something isn't working correctly |
 | `feature` | New feature or enhancement |
 | `api-contract` | API design discussion needed |
+| `api` | General API-related issue |
 | `data-issue` | Missing or incorrect D&D data |
 | `performance` | Performance improvement needed |
+| `refactor` | Code refactoring |
+| `cleanup` | Code cleanup/maintenance |
+| `testing` | Testing related |
+| `coverage` | Test coverage improvements |
+| `ux` | User experience improvements |
+| `breaking-change` | Introduces breaking changes |
+
+### Priority
+| Label | Description |
+|-------|-------------|
+| `priority:high` | Urgent, needs attention soon |
+| `priority:medium` | Important but not urgent |
 
 ### Status
 | Label | Description |
 |-------|-------------|
 | `blocked` | Waiting on external dependency |
 | `needs-discussion` | Needs team input before proceeding |
+
+### Scope
+| Label | Description |
+|-------|-------------|
+| `character` | Character wizard related |
+| `epic` | Large multi-issue feature |
+| `tracking` | Meta-issue tracking other issues |
+| `quality` | Code quality improvements |
 
 ### Source (who discovered it)
 | Label | Description |

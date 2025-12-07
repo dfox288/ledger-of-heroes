@@ -87,23 +87,140 @@ When completing work on frontend or backend:
 
 ## GitHub Issues Workflow
 
-### Creating Issues
+### Creating Issues (Claude Agent Instructions)
+
+When creating issues via `gh issue create`, follow these structured formats.
+
+**Required labels for every issue:**
+1. Assignee: `frontend`, `backend`, or `both`
+2. Type: `bug`, `feature`, `api-contract`, `data-issue`, `refactor`, etc.
+3. Source (if discovered during work): `from:frontend`, `from:backend`, `from:manual-testing`
+
+#### Bug Report Format
 
 ```bash
-# Backend bug
 gh issue create --repo dfox288/dnd-rulebook-project \
-  --title "API returns incorrect spell components" \
-  --label "backend,bug,from:manual-testing"
+  --title "bug: Brief description of the problem" \
+  --label "backend,bug,from:backend" \
+  --body "$(cat <<'EOF'
+## Summary
+One sentence describing the bug.
 
-# Frontend feature
-gh issue create --repo dfox288/dnd-rulebook-project \
-  --title "Add filter persistence to URL" \
-  --label "frontend,feature"
+## Where
+Endpoint, component, or user flow affected (e.g., `GET /api/v1/spells`, `SpellCard.vue`)
 
-# Cross-cutting
+## Expected Behavior
+What should happen.
+
+## Actual Behavior
+What happens instead.
+
+## Steps to Reproduce
+1. Step one
+2. Step two
+3. Step three
+
+## Additional Context
+Error messages, logs, or screenshots if applicable.
+EOF
+)"
+```
+
+#### Feature Request Format
+
+```bash
 gh issue create --repo dfox288/dnd-rulebook-project \
-  --title "Spell filtering API contract mismatch" \
-  --label "both,api-contract"
+  --title "feat: Brief description of feature" \
+  --label "frontend,feature" \
+  --body "$(cat <<'EOF'
+## Summary
+What do you want to add and why?
+
+## Proposed Solution
+How should this be implemented? Affected files, approach.
+
+## Acceptance Criteria
+- [ ] Criterion one
+- [ ] Criterion two
+- [ ] Criterion three
+
+## Related Issues
+#123, #456 (if applicable)
+EOF
+)"
+```
+
+#### API Contract Format
+
+```bash
+gh issue create --repo dfox288/dnd-rulebook-project \
+  --title "api: Endpoint change description" \
+  --label "both,api-contract" \
+  --body "$(cat <<'EOF'
+## Endpoint
+`GET /api/v1/endpoint`
+
+## Current Response
+\`\`\`json
+{ "current": "structure" }
+\`\`\`
+
+## Requested Change
+What needs to be added or changed.
+
+## Frontend Use Case
+Why this change is needed.
+
+## Breaking Change?
+Yes/No - describe impact if yes.
+EOF
+)"
+```
+
+#### Data Issue Format
+
+```bash
+gh issue create --repo dfox288/dnd-rulebook-project \
+  --title "data: Entity name - brief problem" \
+  --label "backend,data-issue" \
+  --body "$(cat <<'EOF'
+## Entity
+Type: Spell/Monster/Item/etc.
+Name: Entity name
+
+## Problem
+What's wrong with the data.
+
+## Source Reference
+PHB p.XXX, XGE, SRD, etc.
+
+## Expected Data
+What the correct values should be.
+EOF
+)"
+```
+
+#### Refactor/Cleanup Format
+
+```bash
+gh issue create --repo dfox288/dnd-rulebook-project \
+  --title "refactor: Brief description" \
+  --label "frontend,refactor" \
+  --body "$(cat <<'EOF'
+## Summary
+What needs to be refactored and why.
+
+## Current State
+Description of current implementation, affected files.
+
+## Proposed Solution
+How to improve it, code examples if helpful.
+
+## Affected Files
+- `path/to/file1.ts`
+- `path/to/file2.vue`
+EOF
+)"
 ```
 
 ### Checking Issues
@@ -117,13 +234,15 @@ gh issue list --repo dfox288/dnd-rulebook-project --label "frontend" --state ope
 gh issue list --repo dfox288/dnd-rulebook-project --state open
 ```
 
-### Labels
+### Labels Reference
 
 | Category | Labels |
 |----------|--------|
 | Assignee | `frontend`, `backend`, `both` |
-| Type | `bug`, `feature`, `api-contract`, `data-issue`, `performance` |
+| Type | `bug`, `feature`, `api-contract`, `api`, `data-issue`, `performance`, `refactor`, `cleanup`, `testing`, `coverage`, `ux`, `breaking-change` |
+| Priority | `priority:high`, `priority:medium` |
 | Status | `blocked`, `needs-discussion` |
+| Scope | `character`, `epic`, `tracking`, `quality` |
 | Source | `from:manual-testing`, `from:frontend`, `from:backend` |
 
 ## D&D 5e API Features (Backend)

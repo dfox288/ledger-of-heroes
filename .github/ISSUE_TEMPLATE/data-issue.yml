@@ -1,0 +1,81 @@
+name: Data Issue
+description: Missing or incorrect D&D 5e data
+labels: ["data-issue", "backend"]
+body:
+  - type: dropdown
+    id: entity
+    attributes:
+      label: Entity Type
+      description: What type of D&D content is affected?
+      options:
+        - Spells
+        - Monsters
+        - Items
+        - Races
+        - Classes
+        - Backgrounds
+        - Feats
+        - Subclasses
+        - Subraces
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: entity-name
+    attributes:
+      label: Entity Name
+      description: Name of the specific spell, monster, item, etc.
+      placeholder: "Fireball, Beholder, Bag of Holding, etc."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: issue-type
+    attributes:
+      label: Issue Type
+      description: What kind of data problem is this?
+      options:
+        - "Missing - Data not in database"
+        - "Incorrect - Wrong values"
+        - "Incomplete - Partial data present"
+        - "Formatting - Data malformed or unreadable"
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Description
+      description: What's wrong with the data?
+    validations:
+      required: true
+
+  - type: textarea
+    id: source
+    attributes:
+      label: Source Reference
+      description: Where can we find the correct information?
+      placeholder: "PHB p.241, XGE p.50, SRD, etc."
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Data
+      description: What should the correct value(s) be?
+      placeholder: |
+        damage: 8d6 fire
+        range: 150 feet
+        components: V, S, M (a tiny ball of bat guano and sulfur)
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Screenshots, API responses, or other context
+    validations:
+      required: false
