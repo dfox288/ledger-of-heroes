@@ -2,7 +2,8 @@
 
 **Related Backend Issue:** #288 (Epic: Slug-based character references)
 **Created:** 2025-12-07
-**Status:** Ready to Begin
+**Status:** ✅ Implementation Complete
+**PR:** https://github.com/dfox288/dnd-rulebook-frontend/pull/30
 
 ## Overview
 
