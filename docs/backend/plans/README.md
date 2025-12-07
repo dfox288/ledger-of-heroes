@@ -1,163 +1,63 @@
-# Implementation Plans
+# Backend Implementation Plans
 
-This directory contains detailed implementation plans for features, enhancements, and refactorings.
+Active implementation plans for the Laravel API backend.
 
----
+## Current Plans
 
-## 🎯 Active Plans (In Progress)
+### Character Builder Features
+| Plan | Description |
+|------|-------------|
+| [multiclass-support-design](2025-12-03-multiclass-support-design.md) | Multiclass system design |
+| [multiclass-implementation](2025-12-03-multiclass-implementation.md) | Multiclass implementation details |
+| [character-portrait-design](2025-12-04-character-portrait-design.md) | Character portrait/avatar system |
+| [character-portrait-plan](2025-12-04-character-portrait-plan.md) | Portrait implementation plan |
+| [hit-dice-tracking-plan](2025-12-04-hit-dice-tracking-plan.md) | Hit dice tracking system |
+| [rest-mechanics-design](2025-12-04-rest-mechanics-design.md) | Short/long rest mechanics |
+| [slug-based-references-design](2025-01-07-slug-based-character-references-design.md) | Slug-based character references |
+| [slug-based-references-plan](2025-01-07-slug-based-character-references-plan.md) | Implementation plan |
 
-### Parser/Importer Refactoring
-**[2025-11-20-parser-importer-refactoring.md](2025-11-20-parser-importer-refactoring.md)**
-- **Status:** 75% complete (Phase 1 & 2)
-- **Branch:** main (merged)
-- **Remaining:** Task 2.4 (LookupsGameEntities) + Phase 3 (Architecture)
-- **Effort:** ~4-6 hours remaining
-- **Goal:** Extract reusable concerns to eliminate code duplication
+### API Improvements
+| Plan | Description |
+|------|-------------|
+| [CHARACTER-API-RESTRUCTURING](CHARACTER-API-RESTRUCTURING-PLAN.md) | Character API restructuring |
+| [ISSUE-255-ENHANCED-STATS](ISSUE-255-ENHANCED-STATS-ENDPOINT.md) | Enhanced stats endpoint |
+| [PLAN-096-equipment-choice](PLAN-096-equipment-choice-items.md) | Equipment choice items |
 
-**Key Deliverables:**
-- ✅ ParsesTraits concern
-- ✅ ParsesRolls concern
-- ✅ ImportsRandomTables concern
-- ✅ ConvertsWordNumbers concern
-- ✅ MapsAbilityCodes concern
-- ✅ Extended MatchesProficiencyTypes
-- ⏳ LookupsGameEntities concern (pending)
-- ⏳ GeneratesSlugs concern (pending)
-- ⏳ BaseImporter abstract class (pending)
+### Data & Language
+| Plan | Description |
+|------|-------------|
+| [issue-139-language-choices](2025-12-04-issue-139-language-choices-design.md) | Language choice system |
+| [issue-140-feat-language-grants](2025-12-04-issue-140-feat-language-grants-design.md) | Feat language grants |
 
----
+## Archived Plans
 
-### Class Importer Enhancements
-**[2025-11-20-class-importer-enhancements.md](2025-11-20-class-importer-enhancements.md)**
-- **Status:** ~40% complete (BATCH 2.1-2.3)
-- **Branch:** `feature/class-importer-enhancements` (NOT merged)
-- **Remaining:** BATCH 2.4-2.5 + Phase 3
-- **Effort:** ~3.5 hours remaining
-- **Goal:** Fix spells_known semantic issue + add proficiency choice support
+Completed plans are in [`../archive/`](../archive/). Key completed work:
+- Parser/Importer consolidation
+- OpenAPI audit
+- API resource standardization
+- Unified choice system
 
-**Key Deliverables:**
-- ✅ Investigation (BATCH 0-1)
-- ✅ Add spells_known column (BATCH 2.1)
-- ✅ Update parser for spells_known (BATCH 2.2)
-- ✅ Update importer for spells_known (BATCH 2.3)
-- ⏳ Data migration (BATCH 2.4)
-- ⏳ Update API (BATCH 2.5)
-- ⏳ Proficiency choices (Phase 3)
-
----
-
-## 📚 Reference Plans (Completed)
-
-### Database Design
-**[2025-11-17-dnd-compendium-database-design.md](2025-11-17-dnd-compendium-database-design.md)**
-- **Status:** Complete, implemented
-- **Type:** Architecture reference
-- **Scope:** Complete database schema design for D&D 5e compendium
-
-**Contents:**
-- 59 migrations
-- Polymorphic relationship patterns
-- Lookup tables (sources, spell schools, damage types, etc.)
-- Entity tables (spells, races, items, backgrounds, classes, feats, monsters)
-- Junction tables (entity_sources, proficiencies, modifiers, etc.)
-
-**Use:** Reference for understanding database architecture decisions
-
----
-
-### XML Importer Implementation (Vertical Slices)
-**[2025-11-17-dnd-xml-importer-implementation-v4-vertical-slices.md](2025-11-17-dnd-xml-importer-implementation-v4-vertical-slices.md)**
-- **Status:** Complete, implemented
-- **Type:** Implementation strategy reference
-- **Scope:** Vertical slice approach for building importers
-
-**Contents:**
-- TDD methodology
-- Parser → Importer → Command → API flow
-- Spell → Race → Item → Background → Feat implementation sequence
-- Testing strategies
-- Common patterns
-
-**Use:** Reference for implementing future importers (e.g., Monster Importer)
-
----
-
-## 🎯 How to Use These Plans
-
-### For Active Development
-1. Read the **Active Plans** section
-2. Check the plan's status and branch
-3. Verify you're on the correct branch
-4. Follow the batch structure (RED-GREEN-REFACTOR)
-5. Run tests after each batch
-6. Commit atomic changes
-
-### For New Features
-1. Review **Reference Plans** for patterns
-2. Follow TDD mandate in `../CLAUDE.md`
-3. Create new plan document (see template below)
-4. Break into batches of ~30-60 min each
-5. Include test examples and acceptance criteria
-
----
-
-## 📝 Plan Template Structure
+## Plan Template
 
 ```markdown
-# Feature Name Implementation Plan
+# Feature Name
 
 **Created:** YYYY-MM-DD
-**Estimated Effort:** X hours
-**Branch:** (to be created)
-**Prerequisites:** List dependencies
+**Status:** Planning | In Progress | Complete
 
 ## Overview
-Brief description of feature and goals
+Brief description
 
-## Phases
-### Phase 1: Name (X hours)
-- BATCH 1.1: Task name (XX min)
-  - Steps
-  - Tests to write
-  - Acceptance criteria
-
-### Phase 2: Name (X hours)
-...
+## Implementation
+### Phase 1: Name
+- Task 1
+- Task 2
 
 ## Verification
-- [ ] Test checklist
-- [ ] Code quality gates
-- [ ] API changes documented
-
-## Files to Create/Modify
-List of expected file changes
+- [ ] Tests pass
+- [ ] API documented
 ```
 
 ---
 
-## 🔍 Plan Status Quick Reference
-
-| Plan | Status | Branch | Tests | Remaining |
-|------|--------|--------|-------|-----------|
-| Parser/Importer Refactoring | 75% | main | 468 ✅ | 4-6 hrs |
-| Class Importer Enhancements | 40% | feature/class-importer-enhancements | 432 ✅ | 3.5 hrs |
-| Database Design | 100% | main | - | - |
-| XML Importer Strategy | 100% | main | - | - |
-
----
-
-## 🎓 Planning Best Practices
-
-1. **Break into Batches:** 30-60 minute chunks
-2. **TDD Structure:** Test → Fail → Implement → Pass → Commit
-3. **Clear Acceptance Criteria:** Define "done" upfront
-4. **Estimate Conservatively:** Add 25% buffer
-5. **Document Decisions:** Why, not just what
-6. **Include Examples:** Code snippets for clarity
-7. **Test Isolation:** Each batch independently testable
-
----
-
-**Navigation:** [Main Docs](../README.md) | [Project Status](../PROJECT-STATUS.md) | [Main Codebase](../../CLAUDE.md)
-
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
+See also: [DND-FEATURES.md](../DND-FEATURES.md) | [Reference docs](../reference/)
