@@ -16,31 +16,47 @@ LOCATION: wrapper/.claude/handoffs.md
 <!-- Agents: Add new handoffs below this line. Delete handoffs after processing. -->
 
 ## For: frontend
-**From:** backend | **Issue:** #535 | **Created:** 2025-12-12
+**From:** backend | **Issue:** #537 | **Created:** 2025-12-12 21:30
 
-**Fixed:** Equipment choices with "item A or item B" alternatives now return separate options.
+HP modification endpoint is live. Replace client-side D&D calculations with backend calls.
 
-**What was fixed:**
-- Bug in `ClassImporter::importEquipmentChoice()` - was using loop index instead of parsed `choice_option`
-- Now "(a) a mace or (b) a warhammer" correctly returns two separate options with `choice_option` 1 and 2
+**What I did:**
+- Implemented `PATCH /api/v1/characters/{id}/hp` with full D&D 5e rule enforcement
+- Handles damage (temp HP absorbs first), healing (caps at max), temp HP (higher-wins)
+- Death saves auto-reset when healing from 0 HP
 
-**What frontend should see now:**
-- Each OR alternative is a separate option in the API response
-- Option "a" contains only the mace, option "b" contains only the warhammer
-- Data needs to be re-imported for fix to take effect
+**What you need to do:**
+- Update HP panel to call the new endpoint instead of local calculations
+- Send `{"hp": "-X"}` for damage, `{"hp": "+X"}` for healing
+- Send `{"temp_hp": X}` for temp HP (0 clears it)
+- Update local state from the response
 
-**To verify:**
-```bash
-# After re-importing data:
-docker compose exec php php artisan import:all
-
-# Then check Cleric equipment choices
-curl "http://localhost:8080/api/v1/characters/12/pending-choices?type=equipment" | jq '.data.choices[0]'
+**Technical details:**
+- Endpoint: `PATCH /api/v1/characters/{id}/hp`
+- Request: `{"hp": "-12"}` or `{"hp": "+8"}` or `{"temp_hp": 10}`
+- Response:
+```json
+{
+  "data": {
+    "current_hit_points": 39,
+    "max_hit_points": 52,
+    "temp_hit_points": 0,
+    "death_save_successes": 0,
+    "death_save_failures": 0
+  }
+}
 ```
 
-**Files changed:**
-- `app/Services/Importers/ClassImporter.php` (1 line fix)
-- `tests/Feature/Importers/ClassImporterTest.php` (new test)
+**Test with:**
+```bash
+curl -X PATCH http://localhost:8080/api/v1/characters/1/hp \
+  -H "Content-Type: application/json" \
+  -d '{"hp": "-12"}'
+```
+
+**Related:**
+- Follows from: #536 (backend implementation)
+- See also: `app/Http/Controllers/Api/CharacterHpController.php`
 
 ---
 
