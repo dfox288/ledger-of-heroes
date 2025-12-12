@@ -284,25 +284,94 @@ CREATE TABLE character_attunements (
 
 ---
 
-## Component Hierarchy
+## Architecture: Extend, Don't Replace
+
+**Key Insight:** The character sheet already has display components for most play-mode features. Instead of building new "play mode" components, we extend existing ones with an `editable` prop.
+
+### Extension Pattern
+
+```vue
+<!-- Before: Display only -->
+<CharacterSheetDeathSaves
+  :successes="stats.death_saves.successes"
+  :failures="stats.death_saves.failures"
+/>
+
+<!-- After: Conditional interactivity -->
+<CharacterSheetDeathSaves
+  :successes="stats.death_saves.successes"
+  :failures="stats.death_saves.failures"
+  :editable="isPlayMode"
+  @roll="handleDeathSaveRoll"
+  @stabilize="handleStabilize"
+/>
+```
+
+### Existing Components to Extend
+
+| Component | Current Display | Play Mode Adds |
+|-----------|-----------------|----------------|
+| `CombatStatsGrid.vue` | HP, AC, Speed | HP edit modal, temp HP |
+| `DeathSaves.vue` | Success/failure circles | Roll button, stabilize, damage |
+| `Conditions.vue` | Alert banner | Add/remove buttons, modal |
+| `SpellSlots.vue` | Slot circles | Click to use/recover |
+| `HitDice.vue` | Available/spent circles | Click to spend during rest |
+| `FeaturesPanel.vue` | Feature descriptions | "Use" button on limited features |
+| `Header.vue` | Inspiration badge | Click to toggle |
+
+### New Components (Minimal)
+
+Only truly new components needed:
+- `RestPanel.vue` — Short/long rest buttons
+- `ShortRestModal.vue` — Hit dice spending flow
+- `LongRestModal.vue` — Confirmation with summary
+- `HpEditModal.vue` — Damage/heal/temp HP
+- `AddConditionModal.vue` — Condition picker
+- `DeathSaveRollModal.vue` — d20 result input
+
+### Benefits
+
+1. **No duplication** — One component serves both modes
+2. **Consistent UX** — Same layout in view and play modes
+3. **Easier testing** — Existing tests still pass
+4. **Smaller bundle** — No separate play mode components
+5. **Progressive enhancement** — Display works without play mode
+
+## Component Hierarchy (Updated)
 
 ```
 CharacterSheet.vue
-├── CharacterSheetHeader.vue (existing)
-├── PlayModePanel.vue (new - container)
-│   ├── HpPanel.vue (#531)
-│   │   └── DeathSavesTracker.vue (#533)
-│   ├── ConditionsPanel.vue (#532)
-│   ├── RestPanel.vue (#534)
-│   │   ├── ShortRestModal.vue
-│   │   ├── LongRestModal.vue
-│   │   └── HitDiceSpender.vue
-│   ├── SpellSlotsPanel.vue (Phase 2)
-│   ├── ResourcesPanel.vue (Phase 2)
-│   └── EquipmentPanel.vue (Phase 3)
-├── AbilityScoreBlock.vue (existing)
-├── SkillsList.vue (existing)
-└── ... other existing components
+├── isPlayMode: boolean (toggle or URL param)
+│
+├── Header.vue
+│   └── [editable] Inspiration badge clickable
+│
+├── CombatStatsGrid.vue
+│   └── [editable] HP cell → opens HpEditModal
+│
+├── DeathSaves.vue (when HP = 0)
+│   └── [editable] Roll/stabilize buttons → DeathSaveRollModal
+│
+├── Conditions.vue
+│   └── [editable] Remove buttons + AddConditionModal
+│
+├── SpellSlots.vue
+│   └── [editable] Click slots to use/recover
+│
+├── HitDice.vue
+│   └── [editable] Click to spend (in rest flow)
+│
+├── RestPanel.vue (NEW)
+│   ├── ShortRestModal.vue (NEW)
+│   └── LongRestModal.vue (NEW)
+│
+├── FeaturesPanel.vue
+│   └── [editable] "Use" button on limited-use features
+│
+├── EquipmentPanel.vue
+│   └── [editable] Equip/unequip, quantity, add/remove
+│
+└── ... other existing components (unchanged)
 ```
 
 ---
