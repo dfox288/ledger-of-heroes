@@ -16,20 +16,20 @@ LOCATION: wrapper/.claude/handoffs.md
 <!-- Agents: Add new handoffs below this line. Delete handoffs after processing. -->
 
 ## For: frontend
-**From:** backend | **Issue:** #560 | **Created:** 2025-12-13 15:30
+**From:** backend | **Issue:** #564 | **Created:** 2025-12-13
 
-Party System API is complete. Frontend needs UI for party management and DM dashboard.
+Party System API + DM Screen data is complete. Frontend needs UI for party management and DM dashboard.
 
-**What I did:**
+**What I did (Issues #559 + #563):**
 - Created Party model with user ownership
 - 8 API endpoints for full CRUD + character management + stats
-- DM Dashboard stats endpoint with HP, AC, passives, saves, conditions, spell slots
-- 37 tests covering all functionality
+- **Expanded DM Dashboard** with combat, senses, capabilities, equipment, party summary
+- 42 tests covering all functionality
 
 **What you need to do:**
 - Party list page (`/parties`) - cards with name, description, character count
 - Party detail page (`/parties/{id}`) - edit party, manage characters
-- DM Dashboard (`/parties/{id}/dashboard`) - side-by-side character stats
+- **DM Screen** (`/parties/{id}/dashboard`) - comprehensive character stats
 - Add character modal - search/select from DM's characters
 
 **API Endpoints:**
@@ -42,41 +42,75 @@ Party System API is complete. Frontend needs UI for party management and DM dash
 | DELETE | `/api/v1/parties/{id}` | Delete party |
 | POST | `/api/v1/parties/{id}/characters` | Add character `{ character_id }` |
 | DELETE | `/api/v1/parties/{id}/characters/{characterId}` | Remove character |
-| GET | `/api/v1/parties/{id}/stats` | DM Dashboard data |
+| GET | `/api/v1/parties/{id}/stats` | **DM Screen data** |
 
-**Stats response shape:**
+**Stats response shape (EXPANDED):**
 ```json
 {
   "data": {
-    "party": { "id": 1, "name": "..." },
+    "party": { "id": 1, "name": "Dragon Heist" },
     "characters": [{
-      "id": 1, "public_id": "...", "name": "...",
-      "level": 5, "class_name": "Fighter",
-      "hit_points": { "current": 38, "max": 45, "temp": 0 },
-      "armor_class": 18, "proficiency_bonus": 3,
-      "passive_skills": { "perception": 14, "investigation": 10, "insight": 12 },
-      "saving_throws": { "STR": 5, "DEX": 2, "CON": 4, "INT": 0, "WIS": 1, "CHA": -1 },
+      "id": 1, "public_id": "...", "name": "Gandalf",
+      "level": 5, "class_name": "Wizard",
+      "hit_points": { "current": 28, "max": 35, "temp": 0 },
+      "armor_class": 15, "proficiency_bonus": 3,
+      "combat": {
+        "initiative_modifier": 2,
+        "speeds": { "walk": 30, "fly": null, "swim": null, "climb": null },
+        "death_saves": { "successes": 0, "failures": 0 },
+        "concentration": { "active": false, "spell": null }
+      },
+      "senses": {
+        "passive_perception": 14, "passive_investigation": 12,
+        "passive_insight": 14, "darkvision": 60
+      },
+      "capabilities": {
+        "languages": ["Common", "Elvish"],
+        "size": "Medium",
+        "tool_proficiencies": ["Thieves' Tools"]
+      },
+      "equipment": {
+        "armor": { "name": "Leather", "type": "light", "stealth_disadvantage": false },
+        "weapons": [{ "name": "Longsword", "damage": "1d8 slashing", "range": null }],
+        "shield": false
+      },
+      "saving_throws": { "STR": 0, "DEX": 2, "CON": 1, "INT": 4, "WIS": 2, "CHA": -1 },
       "conditions": [{ "name": "Poisoned", "slug": "poisoned", "level": null }],
-      "spell_slots": { "1": { "current": 2, "max": 4 } }
-    }]
+      "spell_slots": { "1": { "current": 4, "max": 4 } }
+    }],
+    "party_summary": {
+      "all_languages": ["Common", "Dwarvish", "Elvish"],
+      "darkvision_count": 2,
+      "no_darkvision": ["Aldric"],
+      "has_healer": true,
+      "healers": ["Mira (Cleric)"],
+      "has_detect_magic": true,
+      "has_dispel_magic": false,
+      "has_counterspell": true
+    }
   }
 }
 ```
 
+**Key UI Components:**
+- Initiative tracker (quick reference for combat)
+- HP bars with temp HP indicator
+- Passive skills display (Perception is key for DMs!)
+- Death save tracker
+- Party-wide language/darkvision summary
+- "Who has detect magic?" type quick checks
+
 **Test with:**
 ```bash
-# Create party
-curl -X POST "http://localhost:8080/api/v1/parties" -H "Authorization: Bearer $TOKEN" -d '{"name":"Test Party"}'
-
-# Get stats
-curl "http://localhost:8080/api/v1/parties/1/stats" -H "Authorization: Bearer $TOKEN"
+curl "http://localhost:8080/api/v1/parties/1/stats" -H "Authorization: Bearer $TOKEN" | jq
 ```
 
 **Related:**
-- Follows from: #559 (backend complete)
+- Frontend issue: #564
 - See also: `app/Http/Controllers/Api/PartyController.php`
 
 ---
+
 
 <!-- HANDOFF TEMPLATE (copy this when creating a new handoff):
 
