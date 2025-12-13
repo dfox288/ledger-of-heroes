@@ -112,52 +112,77 @@ curl "http://localhost:8080/api/v1/parties/1/stats" -H "Authorization: Bearer $T
 ---
 
 ## For: frontend
-**From:** backend | **Issue:** #566 | **Created:** 2025-12-13 17:55
+**From:** backend | **Issue:** #588 | **Created:** 2025-12-13
 
-Equipment location slots are now supported. Your inventory tab UI can integrate equip/unequip functionality.
+Attunement behavior changed to match D&D 5e rules. Items now stay attuned when unequipped or displaced.
 
-**What I did (Issue #565):**
-- Added `EquipmentLocation` enum: `main_hand`, `off_hand`, `worn`, `attuned`, `backpack`
-- `PATCH /equipment/{id}` now accepts `location` parameter
-- Auto-sets `equipped` and `is_attuned` based on location
-- Slot enforcement with auto-unequip of previous items
-- 18 new tests, all passing
+**What I did (Issue #583):**
+- Attunement persists when items moved to backpack
+- Attunement persists when items displaced by another item
+- Attunement persists when using `equipped=false`
+- Breaking attunement requires explicit `is_attuned=false`
 
 **What you need to do:**
-- Wire `useInventoryActions.equipItem(id, location)` to the endpoint
-- Update ItemRow action menus to call equip/unequip
-- EquipmentStatus sidebar should display items by slot
-- Handle 422 errors (attunement limit, invalid location, etc.)
+1. **Show attunement on backpack items** - attuned items can now be in backpack
+2. **Add "Break Attunement" action** - users need explicit way to unattune
+3. **Update slot counter** - count ALL attuned items (equipped + backpack)
+4. **Allow attune from backpack** - no need to equip first
 
-**API Contract:**
+**Key behavior change:**
+| Scenario | Old | New |
+|----------|-----|-----|
+| Move attuned item to backpack | Auto-clears | Persists |
+| Displace attuned item | Auto-clears | Persists |
+| Unequip attuned item | Auto-clears | Persists |
+
+**API for breaking attunement:**
 ```bash
-# Equip to main hand
-PATCH /api/v1/characters/{id}/equipment/{equipmentId}
-{"location": "main_hand"}
-
-# Response
-{
-  "data": {
-    "id": 176,
-    "location": "main_hand",
-    "equipped": true,
-    "is_attuned": false
-  }
-}
-```
-
-**Valid locations:** `main_hand` (1), `off_hand` (1), `worn` (1), `attuned` (max 3), `backpack` (unlimited)
-
-**Test with:**
-```bash
-curl -X PATCH "http://localhost:8080/api/v1/characters/1/equipment/1" \
+curl -X PATCH "http://localhost:8080/api/v1/characters/1/equipment/123" \
   -H "Content-Type: application/json" \
-  -d '{"location": "main_hand"}'
+  -d '{"is_attuned": false}'
 ```
 
 **Related:**
-- Backend PR: dfox288/ledger-of-heroes-backend#146
-- Frontend branch ready: `feature/issue-555-inventory-tab`
+- Backend PR: dfox288/ledger-of-heroes-backend#157
+- Backend Issue: #583
+
+---
+
+## For: backend
+**From:** frontend | **Issue:** #589 | **Created:** 2025-12-13
+
+Requesting analysis of adding `equipment_slot` field to items for paperdoll UI.
+
+**Context:**
+Frontend issue #587 is implementing a paperdoll equipment display with 11 body slots. Most item types map clearly (Ring → ring, Armor → armor), but **Wondrous Items** are a catch-all for boots, cloaks, belts, helms, amulets, gauntlets, etc.
+
+**What we need:**
+1. **Data audit** - How many Wondrous Items exist? Can slot be inferred from name patterns?
+2. **Feasibility** - How much work to add slot inference to the importer?
+3. **Recommendation** - Best approach for items that need manual slot assignment?
+
+**Name patterns that could work:**
+| Pattern | Slot |
+|---------|------|
+| Boot, Boots | feet |
+| Cloak, Cape | cloak |
+| Belt, Girdle | belt |
+| Helm, Helmet, Hat, Circlet | head |
+| Amulet, Necklace, Periapt | neck |
+| Gloves, Gauntlets, Bracers | hands |
+
+**Frontend workaround:**
+Until backend provides slot data, frontend will show a manual slot picker modal for Wondrous Items.
+
+**Proposed field:**
+```php
+// Nullable, for items that don't equip to body
+equipment_slot: 'head' | 'neck' | 'cloak' | 'armor' | 'belt' | 'hands' | 'ring' | 'feet' | 'hand' | null
+```
+
+**Related:**
+- Frontend issue: #587 (paperdoll UI)
+- Design doc: `wrapper/docs/frontend/plans/2025-12-13-equipment-paperdoll-design.md`
 
 ---
 
