@@ -148,41 +148,114 @@ curl -X PATCH "http://localhost:8080/api/v1/characters/1/equipment/123" \
 
 ---
 
-## For: backend
-**From:** frontend | **Issue:** #589 | **Created:** 2025-12-13
+## For: frontend
+**From:** backend | **Issue:** #589 | **Created:** 2025-12-14
 
-Requesting analysis of adding `equipment_slot` field to items for paperdoll UI.
+Backend is implementing `equipment_slot` field on items. **Please add `clothes` slot to paperdoll design.**
 
-**Context:**
-Frontend issue #587 is implementing a paperdoll equipment display with 11 body slots. Most item types map clearly (Ring → ring, Armor → armor), but **Wondrous Items** are a catch-all for boots, cloaks, belts, helms, amulets, gauntlets, etc.
+**What I'm doing (Issue #589):**
+- Adding `CLOTHES` case to `EquipmentLocation` enum
+- Adding `equipment_slot` column to items table
+- Auto-inferring slots from item type and name patterns
+- Re-importing all items with slot data
 
-**What we need:**
-1. **Data audit** - How many Wondrous Items exist? Can slot be inferred from name patterns?
-2. **Feasibility** - How much work to add slot inference to the importer?
-3. **Recommendation** - Best approach for items that need manual slot assignment?
+**Slots (13 total):**
+```
+main_hand, off_hand, head, neck, cloak, armor, clothes, belt, hands, feet, ring_1, ring_2, backpack
+```
 
-**Name patterns that could work:**
+**NEW: `clothes` slot** for magical clothing that isn't armor:
+- Robes (Robe of Eyes, Robe of the Archmagi, etc.)
+- Clothes of Mending
+- Glamerweave
+- Shiftweave
+
+**Auto-assignment by item type:**
+| Item Type | Slot |
+|-----------|------|
+| Light/Medium/Heavy Armor | `armor` |
+| Shield | `off_hand` |
+| Ring | `ring` |
+| Melee/Ranged Weapon, Staff, Rod, Wand | `hand` |
+
+**Wondrous Items pattern matching:**
 | Pattern | Slot |
 |---------|------|
-| Boot, Boots | feet |
-| Cloak, Cape | cloak |
-| Belt, Girdle | belt |
-| Helm, Helmet, Hat, Circlet | head |
-| Amulet, Necklace, Periapt | neck |
-| Gloves, Gauntlets, Bracers | hands |
+| Boot, Slipper | `feet` |
+| Cloak, Cape, Mantle, Wings | `cloak` |
+| Belt, Girdle | `belt` |
+| Helm, Hat, Circlet, Crown, Headband, Cap, Goggles, Eyes of | `head` |
+| Amulet, Necklace, Periapt, Medallion, Brooch, Scarab, Talisman, Scarf | `neck` |
+| Glove, Gauntlet, Bracer | `hands` |
+| Robe, Clothes, Glamerweave, Shiftweave | `clothes` |
 
-**Frontend workaround:**
-Until backend provides slot data, frontend will show a manual slot picker modal for Wondrous Items.
+**Coverage:**
+- **1,679 items (67%)** get automatic slot assignment
+- **267 Wondrous Items** remain `null` (tattoos, figurines, bags, etc. - correctly have no body slot)
+- **562 other items** remain `null` (potions, scrolls, gear)
 
-**Proposed field:**
-```php
-// Nullable, for items that don't equip to body
-equipment_slot: 'head' | 'neck' | 'cloak' | 'armor' | 'belt' | 'hands' | 'ring' | 'feet' | 'hand' | null
+**What you need to do:**
+1. Add `clothes` slot to paperdoll (between `armor` and `belt`)
+2. Update `equipmentSlots.ts` utility with new slot
+3. Items with `equipment_slot` set can skip the slot picker modal
+4. Items with `equipment_slot = null` still need manual picker
+
+**Response shape update:**
+```json
+{
+  "data": {
+    "id": 1,
+    "slug": "phb:cloak-of-protection",
+    "name": "Cloak of Protection",
+    "equipment_slot": "cloak",
+    ...
+  }
+}
 ```
 
 **Related:**
 - Frontend issue: #587 (paperdoll UI)
-- Design doc: `wrapper/docs/frontend/plans/2025-12-13-equipment-paperdoll-design.md`
+- Design doc needs update: `wrapper/docs/frontend/plans/2025-12-13-equipment-paperdoll-design.md`
+
+---
+
+## For: frontend
+**From:** backend | **Issue:** #591 | **Created:** 2025-12-14
+
+Backend now correctly computes `is_dead` when `death_save_failures` reaches 3. Frontend can remove defensive logic.
+
+**What I did (Issue #590):**
+- Added model boot event to auto-compute `is_dead = true` when `death_save_failures >= 3`
+- Death state now computed correctly regardless of update path (API PATCH, direct model, or death save controller)
+- Documented that reducing death saves does NOT auto-revive (D&D 5e RAW - requires resurrection magic)
+
+**What you need to do:**
+1. **Remove defensive logic** that locally computes death state from `death_save_failures`
+2. **Trust `is_dead` from API** as the single source of truth
+3. **Simplify UI logic** to just check `character.is_dead`
+
+**API behavior:**
+| Action | Result |
+|--------|--------|
+| Set `death_save_failures = 3` via PATCH | `is_dead` auto-set to `true` |
+| Reduce `death_save_failures` below 3 | `is_dead` stays `true` (requires resurrection) |
+| Use `/api/v1/characters/{id}/revive` | `is_dead` set to `false`, death saves reset |
+
+**Response shape (unchanged):**
+```json
+{
+  "data": {
+    "is_dead": true,
+    "death_save_failures": 3,
+    "current_hit_points": 0
+  }
+}
+```
+
+**Related:**
+- Backend PR: dfox288/ledger-of-heroes-backend#161
+- Original bug: #590
+- Frontend issue: #591
 
 ---
 
