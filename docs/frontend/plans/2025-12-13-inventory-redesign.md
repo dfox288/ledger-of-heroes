@@ -1,8 +1,8 @@
 # Inventory Tab Redesign
 
-**Issue:** #555
+**Issue:** #567
 **Created:** 2025-12-13
-**Status:** Design Complete
+**Status:** ✅ Complete (PR #78 merged 2025-12-13)
 
 ## Overview
 
@@ -160,14 +160,12 @@ Read-only modal triggered by clicking item name/row:
 - Add `group` field to equipment endpoint response
 - Values: `Weapons`, `Armor`, `Consumables`, `Gear`, `Miscellaneous`
 
-## Out of Scope
+## Originally Out of Scope (Delivered Anyway)
 
-- Sell modal implementation (existing stub remains)
-- Edit Qty modal implementation (existing stub remains)
-- Shop modal improvements
-- Add Loot modal improvements
-
-These will be addressed in future sessions.
+- ✅ Sell modal implementation → `SellModal.vue`
+- ✅ Edit Qty modal implementation → `EditQuantityModal.vue`
+- ✅ Shop modal improvements → coin icons, currency display
+- ✅ Add Loot modal improvements → tabbed interface
 
 ## Testing Strategy
 

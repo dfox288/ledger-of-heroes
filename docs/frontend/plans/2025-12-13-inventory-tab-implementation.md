@@ -10,7 +10,22 @@
 
 **Design Document:** `docs/frontend/plans/2025-12-13-inventory-tab-design-v2.md`
 
-**GitHub Issue:** #555
+**GitHub Issue:** #567
+
+---
+
+## Progress Summary
+
+| Phase | Status | Notes |
+|-------|--------|-------|
+| 1. Foundation | ✅ COMPLETE | Tab navigation, page routing, CharacterPageHeader |
+| 2. Sidebar | ✅ COMPLETE | EquipmentStatus, EncumbranceBar, Currency section |
+| 3. Item Display | ✅ COMPLETE | ItemTable (grouped), ItemDetailModal (fetch on open) |
+| 4. Add Loot Modal | ✅ COMPLETE | Tabbed UI (Search/Custom), full-width inputs |
+| 5. Shop Modal | 🔄 NEXT | To be implemented next session |
+| 6. Integration | ✅ MOSTLY DONE | Page wired up, play mode working |
+
+**Last Updated:** 2025-12-13
 
 ---
 
