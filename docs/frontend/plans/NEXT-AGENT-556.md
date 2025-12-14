@@ -1,16 +1,17 @@
-# Next Agent: Implement Spells Tab (#556)
+# ~~Next Agent: Implement Spells Tab (#556)~~
 
-## Quick Start
+> **Status:** ✅ COMPLETE - PR #91 created 2025-12-14
 
-```bash
-cd /Users/dfox/Development/ledger-of-heroes/frontend
-git checkout feature/issue-556-spells-tab
-```
+## Completed Work
 
-## Your Task
+- PR: https://github.com/dfox288/ledger-of-heroes-frontend/pull/91
+- Branch: `feature/issue-556-spells-tab`
+- Tests: 1292 pass
+- Issue comment: https://github.com/dfox288/ledger-of-heroes/issues/556#issuecomment-3650949282
 
-Implement the Spells Tab following the detailed plan at:
-**`wrapper/docs/frontend/plans/2025-12-14-spells-tab-implementation.md`**
+## Implementation Plan (for reference)
+
+See: `wrapper/docs/frontend/plans/2025-12-14-spells-tab-implementation.md`
 
 ## Required Skill
 
