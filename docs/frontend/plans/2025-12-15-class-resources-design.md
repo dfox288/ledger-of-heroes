@@ -87,23 +87,29 @@ server/api/characters/[id]/
 ### New Nitro Route
 
 ```typescript
-// server/api/characters/[id]/counters/[counterId].patch.ts
-// Body: { action: "use" | "restore" }
-// Returns: Updated counter object
+// server/api/characters/[id]/counters/[slug].patch.ts
+// Body: { action: "use" | "restore" | "reset" }
+// Returns: { data: Counter }
 ```
+
+**Backend endpoint (verified):**
+```
+PATCH /api/v1/characters/{id}/counters/{slug}
+```
+Note: Uses `slug` (e.g., `phb:bard:bardic-inspiration`) not numeric ID.
 
 ### Optimistic Updates
 
 ```typescript
-async function spendCounter(counterId: number) {
+async function spendCounter(slug: string) {
   // Optimistic: decrement locally
-  const counter = counters.value.find(c => c.id === counterId)
+  const counter = counters.value.find(c => c.slug === slug)
   if (counter && counter.current > 0) {
     counter.current--
   }
 
   try {
-    await apiFetch(`/characters/${characterId}/counters/${counterId}`, {
+    await apiFetch(`/characters/${characterId}/counters/${encodeURIComponent(slug)}`, {
       method: 'PATCH',
       body: { action: 'use' }
     })
@@ -170,14 +176,14 @@ interface Props {
 1. `app/components/character/sheet/ClassResources.vue`
 2. `app/components/character/sheet/ClassResourcesManager.vue`
 3. `app/components/character/sheet/ClassResourceCounter.vue`
-4. `server/api/characters/[id]/counters/[counterId].patch.ts`
+4. `server/api/characters/[id]/counters/[slug].patch.ts`
 5. `tests/components/character/sheet/ClassResources.test.ts`
 6. `tests/components/character/sheet/ClassResourcesManager.test.ts`
 7. `tests/components/character/sheet/ClassResourceCounter.test.ts`
 
 ## Dependencies
 
-- Backend endpoint `PATCH /characters/{id}/counters/{counterId}` (from #647 - verify exists)
+- ✅ Backend endpoint `PATCH /characters/{id}/counters/{slug}` (from #647 - verified working)
 
 ## Page Integration
 
