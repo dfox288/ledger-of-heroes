@@ -85,6 +85,61 @@ curl "http://localhost:8080/api/v1/characters/1" | jq '.data.counters'
 
 ---
 
+## For: frontend
+**From:** backend | **Issue:** #685, #688 | **Created:** 2025-12-16 12:45
+
+Party stats endpoint now includes counters! DM Screen can display Rage, Ki Points, Action Surge, etc. at a glance.
+
+**What I did:**
+- Added `counters` array to each character in `GET /parties/{id}/stats`
+- Same format as individual character counters (see handoff above)
+- Optimized with eager loading to avoid N+1 queries
+
+**What you need to do:**
+- Add counter display to DM Screen party view
+- Show current/max for each counter (e.g., "Rage: 2/3")
+- Consider grouping by reset timing (short rest vs long rest)
+- Use PATCH `/characters/{id}/counters/{slug}` to update (same as individual chars)
+
+**Response shape (per character in party stats):**
+```json
+{
+  "characters": [
+    {
+      "name": "Grunk",
+      "level": 5,
+      "class_name": "Barbarian",
+      "counters": [
+        {
+          "id": 123,
+          "slug": "phb:barbarian:rage",
+          "name": "Rage",
+          "current": 2,
+          "max": 3,
+          "reset_on": "long_rest",
+          "source": "Barbarian",
+          "source_type": "class",
+          "unlimited": false
+        }
+      ]
+    }
+  ]
+}
+```
+
+**Test with:**
+```bash
+curl "http://localhost:8080/api/v1/parties/1/stats" | jq '.data.characters[] | {name, counters}'
+```
+
+**Related:**
+- Closes: #685 (Backend party stats counters)
+- Unblocks: #606 (DM Screen class resource tracker)
+- See also: #688 (Frontend issue created for this)
+- Backend PR: dfox288/ledger-of-heroes-backend#188
+
+---
+
 <!-- HANDOFF TEMPLATE (copy this when creating a new handoff):
 
 ## For: frontend|backend
