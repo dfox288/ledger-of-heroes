@@ -15,9 +15,45 @@ LOCATION: wrapper/.claude/handoffs.md
 
 <!-- Agents: Add new handoffs below this line. Delete handoffs after processing. -->
 
+## For: backend
+**From:** frontend | **Issue:** #647 | **Created:** 2025-12-15 08:50
 
+Class resource counters needed for character sheet (Rage, Ki Points, Sorcery Points, etc.).
 
+**What frontend needs:**
+- Character response to include `class_resources` array
+- Each resource: id, name, slug, current, max, reset_on
+- PATCH endpoint to update current value
+- Resources auto-reset on short/long rest
 
+**Priority resources:**
+| Class | Resource | Max | Resets |
+|-------|----------|-----|--------|
+| Barbarian | Rage | 2-6 by level | Long rest |
+| Monk | Ki Points | = monk level | Short rest |
+| Fighter | Action Surge | 1-2 | Short rest |
+| Sorcerer | Sorcery Points | = sorc level | Long rest |
+
+**Expected response shape:**
+```json
+{
+  "class_resources": [
+    { "id": 1, "slug": "rage", "name": "Rage", "current": 2, "max": 3, "reset_on": "long_rest" }
+  ]
+}
+```
+
+**Test with:**
+```bash
+# After implementation
+curl "http://localhost:8080/api/v1/characters/1" | jq '.data.class_resources'
+```
+
+**Related:**
+- Blocks: #632 (Frontend class resource counters)
+- Also needed for: #606 (DM Screen resource tracker)
+
+---
 
 <!-- HANDOFF TEMPLATE (copy this when creating a new handoff):
 
