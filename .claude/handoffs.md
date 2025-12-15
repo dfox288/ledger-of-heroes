@@ -15,6 +15,64 @@ LOCATION: wrapper/.claude/handoffs.md
 
 <!-- Agents: Add new handoffs below this line. Delete handoffs after processing. -->
 
+## For: frontend
+**From:** backend | **Issue:** #681 | **Created:** 2025-12-15 16:35
+
+Encounter presets API is ready! DMs can now save and load monster groups.
+
+**What I did:**
+- Added CRUD endpoints for encounter presets at `/parties/{party}/encounter-presets`
+- Load endpoint creates EncounterMonster records with proper auto-labeling
+- Response includes `monster_name` and `challenge_rating` for easy display
+- 20 tests covering all operations
+
+**What you need to do:**
+- Add "Save as Preset" UI when encounter has monsters
+- Add "Load Preset" selector in DM Screen encounter panel
+- Implement preset management (rename, delete)
+
+**API contract:**
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/parties/{party}/encounter-presets` | List presets |
+| POST | `/parties/{party}/encounter-presets` | Create preset |
+| PATCH | `/parties/{party}/encounter-presets/{id}` | Rename |
+| DELETE | `/parties/{party}/encounter-presets/{id}` | Delete |
+| POST | `/parties/{party}/encounter-presets/{id}/load` | Load into encounter |
+
+**Response shape:**
+```json
+{
+  "data": [{
+    "id": 1,
+    "name": "Goblin Patrol",
+    "monsters": [
+      { "monster_id": 5, "quantity": 4, "monster_name": "Goblin", "challenge_rating": "1/4" }
+    ],
+    "created_at": "...",
+    "updated_at": "..."
+  }]
+}
+```
+
+**Test with:**
+```bash
+# Create preset
+curl -X POST "http://localhost:8080/api/v1/parties/1/encounter-presets" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Test", "monsters": [{"monster_id": 1, "quantity": 2}]}'
+
+# Load preset
+curl -X POST "http://localhost:8080/api/v1/parties/1/encounter-presets/1/load"
+```
+
+**Related:**
+- Closes: #667 (original request)
+- Backend PR: dfox288/ledger-of-heroes-backend#182
+- See also: `useEncounterMonsters.ts`
+
+---
+
 ## For: backend
 **From:** frontend | **Issue:** #647 | **Created:** 2025-12-15 08:50
 
