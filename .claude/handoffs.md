@@ -16,129 +16,70 @@ LOCATION: wrapper/.claude/handoffs.md
 <!-- Agents: Add new handoffs below this line. Delete handoffs after processing. -->
 
 ## For: frontend
-**From:** backend | **Issue:** #647 | **Created:** 2025-12-15 18:30
+**From:** backend | **Issue:** #692 | **Created:** 2025-12-16 11:00
 
-Class counters API is ready! Characters now expose Rage, Ki Points, Sorcery Points, etc.
-
-**IMPORTANT NAMING CHANGE:** We're using `counters` instead of `class_resources` - aligns with existing `class_counters` table.
+Implemented multiclass spellcasting API support per your request.
 
 **What I did:**
-- Added `counters` array to character response
-- Created dedicated counter endpoints for listing and updating
-- Counters auto-initialize from class features when characters are created
-- Integrated with existing short/long rest mechanics
+- Added `class_slug` field to `CharacterSpellResource`
+- Changed `spellcasting` in stats endpoint from single object to per-class keyed object
+- Pact magic already tracked separately (was already implemented)
+- Added migration for `class_slug` column on `character_spells` table
 
-**What you need to do:**
-- Update character sheet to display `counters` array (not `class_resources`)
-- Add use/restore controls for each counter
-- Implement DM Screen resource tracker using same data
+**API Changes:**
 
-**API contract:**
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/characters/{id}` | Includes `counters` array in response |
-| GET | `/characters/{id}/counters` | List all counters |
-| PATCH | `/characters/{id}/counters/{slug}` | Update counter |
-
-**Response shape (in character response):**
+1. **CharacterSpellResource** - Now includes `class_slug`:
 ```json
 {
-  "counters": [
-    {
-      "id": 123,
-      "slug": "phb:barbarian:rage",
-      "name": "Rage",
-      "current": 2,
-      "max": 3,
-      "reset_on": "long_rest",
-      "source": "Barbarian",
-      "source_type": "class",
-      "unlimited": false
-    }
-  ]
+  "source": "class",
+  "class_slug": "wizard",  // NEW - identifies which class grants the spell
+  "spell": { ... }
 }
 ```
 
-**Update counter:**
-```bash
-# Use action (increment/decrement)
-curl -X PATCH "http://localhost:8080/api/v1/characters/1/counters/phb:barbarian:rage" \
-  -H "Content-Type: application/json" \
-  -d '{"action": "use"}'   # or "restore" or "reset"
-
-# Set absolute spent value
-curl -X PATCH "http://localhost:8080/api/v1/characters/1/counters/phb:barbarian:rage" \
-  -H "Content-Type: application/json" \
-  -d '{"spent": 2}'   # sets current = max - spent
-```
-
-**Test with:**
-```bash
-curl "http://localhost:8080/api/v1/characters/1" | jq '.data.counters'
-```
-
-**Related:**
-- Closes: #647 (Backend class resources API)
-- Unblocks: #632 (Frontend class resource counters)
-- Also enables: #606 (DM Screen resource tracker)
-- Note: `/feature-uses` endpoint deprecated, use `/counters`
-
----
-
-## For: frontend
-**From:** backend | **Issue:** #685, #688 | **Created:** 2025-12-16 12:45
-
-Party stats endpoint now includes counters! DM Screen can display Rage, Ki Points, Action Surge, etc. at a glance.
-
-**What I did:**
-- Added `counters` array to each character in `GET /parties/{id}/stats`
-- Same format as individual character counters (see handoff above)
-- Optimized with eager loading to avoid N+1 queries
-
-**What you need to do:**
-- Add counter display to DM Screen party view
-- Show current/max for each counter (e.g., "Rage: 2/3")
-- Consider grouping by reset timing (short rest vs long rest)
-- Use PATCH `/characters/{id}/counters/{slug}` to update (same as individual chars)
-
-**Response shape (per character in party stats):**
+2. **CharacterStatsResource** `/characters/{id}/stats` - Per-class spellcasting:
 ```json
 {
-  "characters": [
-    {
-      "name": "Grunk",
-      "level": 5,
-      "class_name": "Barbarian",
-      "counters": [
-        {
-          "id": 123,
-          "slug": "phb:barbarian:rage",
-          "name": "Rage",
-          "current": 2,
-          "max": 3,
-          "reset_on": "long_rest",
-          "source": "Barbarian",
-          "source_type": "class",
-          "unlimited": false
-        }
-      ]
-    }
-  ]
+  "spellcasting": {
+    "wizard": { "ability": "INT", "ability_modifier": 3, "spell_save_dc": 14, "spell_attack_bonus": 6 },
+    "cleric": { "ability": "WIS", "ability_modifier": 2, "spell_save_dc": 13, "spell_attack_bonus": 5 }
+  },
+  "spell_slots": {
+    "slots": { "1": { "total": 4, "spent": 0, "available": 4 }, ... },
+    "pact_magic": null  // or { "level": 5, "total": 2, "spent": 0, "available": 2 }
+  }
 }
 ```
 
+**Answers to your questions:**
+1. Class tracking: NOW implemented via `class_slug` field
+2. Multiclass spell slots: YES, already using PHB formula correctly
+3. Warlock pact slots: YES, already tracked separately in `pact_magic`
+
+**BREAKING CHANGE:**
+The `spellcasting` field format changed. Frontend needs to update from:
+- Old: `stats.spellcasting.ability`
+- New: `stats.spellcasting[classSlug].ability`
+
 **Test with:**
 ```bash
-curl "http://localhost:8080/api/v1/parties/1/stats" | jq '.data.characters[] | {name, counters}'
+# Stats endpoint shows per-class spellcasting
+curl "http://localhost:8080/api/v1/characters/{id}/stats"
+
+# Spells endpoint shows class_slug
+curl "http://localhost:8080/api/v1/characters/{id}/spells"
 ```
 
+**Note:** The `class_slug` field will be `null` for existing character spells until they're re-assigned with the updated services. New spells added after the migration runs will have the correct `class_slug` set.
+
+**Branch:** `feature/issue-692-multiclass-spellcasting-api` (ready for PR)
+
 **Related:**
-- Closes: #685 (Backend party stats counters)
-- Unblocks: #606 (DM Screen class resource tracker)
-- See also: #688 (Frontend issue created for this)
-- Backend PR: dfox288/ledger-of-heroes-backend#188
+- Backend issue: #692
+- Frontend issue: #631
 
 ---
+
 
 <!-- HANDOFF TEMPLATE (copy this when creating a new handoff):
 
