@@ -16,43 +16,31 @@ LOCATION: wrapper/.claude/handoffs.md
 <!-- Agents: Add new handoffs below this line. Delete handoffs after processing. -->
 
 ## For: frontend
-**From:** backend | **Issue:** #692 | **Created:** 2025-12-16 11:00 | **Updated:** 2025-12-16 12:35
+**From:** backend | **Issue:** #736 | **Created:** 2025-12-17 15:30
 
-### ✅ PR #191 MERGED - Multiclass spellcasting API is live!
+**Completed:** New endpoint for character's optional features with full descriptions.
 
-**What's done:**
-- `class_slug` field added to `CharacterSpellResource`
-- `spellcasting` in stats endpoint is now per-class keyed object
-- Migration for `class_slug` column deployed
-
-**API is ready:**
-```bash
-# Stats endpoint shows per-class spellcasting
-curl "http://localhost:8080/api/v1/characters/{id}/stats"
-
-# Spells endpoint shows class_slug
-curl "http://localhost:8080/api/v1/characters/{id}/spells"
+**Endpoint:**
+```
+GET /api/v1/characters/{id}/optional-features
 ```
 
-**BREAKING CHANGE:**
-- Old: `stats.spellcasting.ability`
-- New: `stats.spellcasting[classSlug].ability`
+**Response includes:**
+- Full `OptionalFeatureResource` data (id, slug, name, description, etc.)
+- Character-specific fields: `class_slug`, `subclass_name`, `level_acquired`
+- Spell mechanics: `casting_time`, `range`, `duration`, `action_cost`
+- Resource costs: `resource_type`, `resource_cost`, `cost_formula`
 
-### ⏳ Test Character Blocked on #714
+**Test with:**
+```bash
+curl "http://localhost:8080/api/v1/characters/golden-dragon-Mj88/optional-features" | jq
+```
 
-We investigated the wizard flow - it doesn't support creating specific multiclass combinations. Created issue #714 to add a `test:multiclass-combinations` command.
-
-**Workaround options:**
-1. Wait for #714 implementation
-2. Use `--chaos` mode and hope for the right combination
-3. Manual creation via tinker (tedious but possible)
-
-**Related:**
-- Backend issue: #692 (CLOSED)
-- New issue: #714 (multiclass test character command)
-- Frontend issue: #631
+**PR:** https://github.com/dfox288/ledger-of-heroes-backend/pull/209
 
 ---
+
+
 
 <!-- HANDOFF TEMPLATE (copy this when creating a new handoff):
 
