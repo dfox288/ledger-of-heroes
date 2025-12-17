@@ -16,29 +16,86 @@ LOCATION: wrapper/.claude/handoffs.md
 <!-- Agents: Add new handoffs below this line. Delete handoffs after processing. -->
 
 ## For: frontend
-**From:** backend | **Issue:** #736 | **Created:** 2025-12-17 15:30
+**From:** backend | **Issue:** #747 | **Created:** 2025-12-18 15:30
 
-**Completed:** New endpoint for character's optional features with full descriptions.
+Entity view endpoints now expose choice information for displaying fixed vs choice bonuses.
 
-**Endpoint:**
+**What I did:**
+- Added `choices` field to Race, Background, and Feat resources
+- Added `equipment_choices` field to Background resource (grouped format)
+- Subraces include parent choices in `inherited_data.choices`
+
+**What you need to do:**
+- Update `AbilityScoresCard.vue` to show fixed modifiers vs ability score choices
+- Update `BackgroundDetailModal.vue` to show language/proficiency choices
+- Update `FeatDetailModal.vue` to show spell/proficiency/ability choices
+- Use `equipment_choices` for background equipment options (same format as class)
+
+**API Response Format:**
+
+`GET /api/v1/races/{id}` - `choices` field:
+```json
+{
+  "data": {
+    "modifiers": [{ "ability_code": "CHA", "value": 2 }],
+    "choices": [
+      {
+        "id": 123,
+        "choice_type": "ability_score",
+        "choice_group": "ability_score_choice",
+        "quantity": 2,
+        "constraint": "different",
+        "description": "Choose two different ability scores to increase by 1",
+        "is_required": true
+      }
+    ]
+  }
+}
 ```
-GET /api/v1/characters/{id}/optional-features
+
+`GET /api/v1/backgrounds/{id}` - `choices` + `equipment_choices`:
+```json
+{
+  "data": {
+    "choices": [
+      { "choice_type": "language", "quantity": 2, "description": "Choose two languages" }
+    ],
+    "equipment_choices": [
+      {
+        "choice_group": "weapon_choice",
+        "quantity": 1,
+        "options": [
+          { "option": "a", "label": "Longsword", "items": [{ "slug": "longsword", "name": "Longsword" }] },
+          { "option": "b", "label": "Shortsword", "items": [{ "slug": "shortsword", "name": "Shortsword" }] }
+        ]
+      }
+    ]
+  }
+}
 ```
 
-**Response includes:**
-- Full `OptionalFeatureResource` data (id, slug, name, description, etc.)
-- Character-specific fields: `class_slug`, `subclass_name`, `level_acquired`
-- Spell mechanics: `casting_time`, `range`, `duration`, `action_cost`
-- Resource costs: `resource_type`, `resource_cost`, `cost_formula`
+**Choice types by entity:**
+| Entity | Choice Types |
+|--------|--------------|
+| Race | `ability_score`, `language`, `proficiency`, `spell` |
+| Background | `language`, `proficiency` (equipment in separate field) |
+| Feat | `spell`, `proficiency`, `ability_score` |
 
 **Test with:**
 ```bash
-curl "http://localhost:8080/api/v1/characters/golden-dragon-Mj88/optional-features" | jq
+# Half-Elf has ability score choices
+curl "http://localhost:8080/api/v1/races/1" | jq '.data.choices'
+
+# Backgrounds with language choices
+curl "http://localhost:8080/api/v1/backgrounds/1" | jq '.data.choices'
 ```
 
-**PR:** https://github.com/dfox288/ledger-of-heroes-backend/pull/209
+**Related:**
+- Closes: #747
+- OpenAPI docs updated: http://localhost:8080/docs/api
 
 ---
+
 
 
 
