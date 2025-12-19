@@ -10,6 +10,26 @@
 
 ---
 
+## Progress (Updated 2025-12-19)
+
+| Task | Status | Commit |
+|------|--------|--------|
+| 1. Equipment item type interface | ✅ Complete | `ca98300` |
+| 2. Versatile damage display | ✅ Complete | `90bc49d` |
+| 3. Range display | ✅ Complete | `11d5cf8` |
+| 4. Armor type and DEX cap | ✅ Complete | `2fb208c` |
+| 5. Magic bonus badge | ⏳ Pending | - |
+| 6. Static charge display | ⏳ Pending | - |
+| 7. Interactive charge tracking | ⏳ Pending | - |
+| 8. Properties from equipment data | ⏳ Pending | - |
+| 9. Final integration test | ⏳ Pending | - |
+| 10. Create PR | ⏳ Pending | - |
+
+**Branch:** `feature/issue-757-equipment-display`
+**Tests:** 25 passing (7 new tests added)
+
+---
+
 ## Task 1: Add Equipment Item Type Interface
 
 **Files:**
